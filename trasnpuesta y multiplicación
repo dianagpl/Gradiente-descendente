@@ -1,0 +1,41 @@
+import numpy as np
+
+A_coef = np.array([[2.0, 1.0, -3.0], [5.0, -4.0, 1.0], [1.0, -1.0, -4.0]])
+b_coef = np.array([7.0, -19.0, 4.0])
+x_sol = np.array([1.0, 1.0, 1.0])
+
+def transpuesta(A):
+    x = len(A)
+    y = len(A[0])
+    return [[A[j][i] for j in range(x)] for i in range(y)]
+
+def m_mat(A,b):
+    C=[]
+    for i in range(0, len(A)):
+        temp=[]
+        for j in range(0, len(b)):
+            x=0
+            for n in range(0, len(A[0])):
+                x += A[i][n]*b[n][j]
+            temp.append(x)
+    C.append(temp)        
+    return C
+
+def gradiante(x,A,b):
+    element_1 = m_mat(transpuesta(A),m_mat(A, x))
+    element_2 = m_mat(transpuesta(A), b)
+    return [i-j for i,j in zip (element_1, element_2)]
+
+
+def linear_solve(M, v, x_start, umbral, max_iter):
+    k = 0.002
+    for i in range(max_iter):
+        print(x_start)
+        x_start = x_start - k * gradiante(x_start,M,v)
+        current_v = m_mat(M,x_start)
+        error_np = (abs(current_v-v))
+        if error_np < umbral:
+            return x_start
+    
+        
+print(linear_solve(A_coef, b_coef, x_sol, 0.00001, 10000))
